@@ -83,5 +83,15 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Fetch the roles from the db
+app.get('/api/roles', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM roles ORDER BY id ASC');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).send("Database Error");
+    }
+});
+
 // Start the engine
 app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));
