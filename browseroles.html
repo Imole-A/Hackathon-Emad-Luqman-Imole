@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 - Browse Roles</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-blue); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            background-color: var(--white);
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+            min-height: 60vh;
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* === SEARCH & FILTER === */
+        .search-bar {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        /* === ROLE CARDS GRID === */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            background: var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 15px rgba(0, 123, 255, 0.15); 
+        }
+
+        .card h3 { 
+            margin-top: 0; 
+            color: var(--primary-blue); 
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .card p { flex-grow: 1; font-size: 0.95rem; color: #555;}
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-outline:hover { 
+            background-color: var(--light-blue); 
+        }
+
+        /* === MODAL (POP-UP) STYLING === */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+            background: none;
+            border: none;
+        }
+        
+        .close-btn:hover { color: var(--danger); }
+
+        .tag {
+            display: inline-block;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin: 0 5px 5px 0;
+            font-weight: bold;
+        }
+
+        .salary-badge {
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Consultant Portal</h1>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='user-portal.html'">Dashboard</button>
+            <button class="active">Browse Roles</button>
+            <button onclick="window.location.href='user-portal.html'">Self-Assessment</button>
+            <button onclick="window.location.href='user-portal.html'">My Roadmap</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Ten10 Role Directory</h2>
+        <p>Explore the required skills, qualifications, and progression paths for tech roles within the consultancy. Click on any role to view the full matrix benchmark.</p>
+        
+        <div class="search-bar">
+            <input type="text" id="searchInput" onkeyup="filterRoles()" placeholder="Search for a role (e.g., Data Engineer, DevOps)...">
+        </div>
+
+        <div class="card-grid" id="roleGrid">
+            </div>
+    </div>
+
+    <div class="modal-overlay" id="roleModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle">Role Title</h2>
+            <div id="modalSalary" class="salary-badge">Salary Range</div>
+            
+            <h3>Job Overview</h3>
+            <p id="modalOverview">Overview text goes here.</p>
+            
+            <h3>Core Technical Skills</h3>
+            <div id="modalTechSkills" style="margin-bottom: 15px;"></div>
+
+            <h3>Soft Skills</h3>
+            <div id="modalSoftSkills" style="margin-bottom: 15px;"></div>
+
+            <h3>Qualifications & Tools</h3>
+            <p id="modalQualifications"></p>
+            
+            <button class="btn-outline" style="background: var(--primary-blue); color: var(--white);" onclick="closeModal()">Close Matrix</button>
+        </div>
+    </div>
+
+    <script>
+        // Data extracted directly from your Hackathon.docx file
+        const roleDatabase = [
+            {
+                title: "Business Analyst",
+                shortDesc: "Identify business needs and determine solutions to business problems in Digital Transformation projects.",
+                salary: "£32,000 – £95,000+",
+                overview: "Business Analysts identify business needs and determine solutions to business problems. This frequently involves Digital Transformation projects—replacing manual workflows with automated, AI-driven systems. They operate across core sectors ensuring technical projects deliver commercial value.",
+                techSkills: ["Requirements Engineering", "Data Visualization (Power BI/Tableau)", "Process Modelling (BPMN 2.0/UML)", "SQL & Analysis"],
+                softSkills: ["Stakeholder Management", "Facilitation Workshops", "Strategic Thinking"],
+                qualifications: "Mandatory: Degree in Business/IT. Desirable: BCS International Diploma, Agile (CABA), Prince2."
+            },
+            {
+                title: "Project Manager",
+                shortDesc: "Outcome Champions responsible for the end-to-end delivery of strategic tech initiatives.",
+                salary: "£32,000 – £120,000+",
+                overview: "Project Managers are responsible for the end-to-end delivery of strategic initiatives. They leverage real-time data dashboards and AI forecasting to mitigate risks before they impact the critical path. They ensure all outputs comply with regulations and Cyber Security principles.",
+                techSkills: ["Methodology Mastery (Agile/Waterfall)", "AI-Driven Project Controls", "Financial Acumen (CAPEX/OPEX)", "Risk & Scenario Planning"],
+                softSkills: ["Stakeholder Influence", "Adaptive Leadership", "Conflict Resolution"],
+                qualifications: "Mandatory: Degree or Level 4/6 PM Apprenticeship. Required: PRINCE2 or APM Certification."
+            },
+            {
+                title: "Data Engineer",
+                shortDesc: "Build the infrastructure that supports growing AI and Analytics sectors.",
+                salary: "£35,000 – £90,000",
+                overview: "Data Engineers are responsible for the infrastructure that supports the UK’s growing AI and Analytics sectors. They ensure data is securely transported, compliant with GDPR, and structured for use by Data Scientists and Business Analysts.",
+                techSkills: ["Advanced SQL", "Python (Pandas, PySpark)", "Data Modelling", "Cloud platforms (AWS/Azure/GCP)"],
+                softSkills: ["Stakeholder Management", "Problem-solving under pressure", "Architectural Thinking"],
+                qualifications: "Mandatory: Degree in quantitative subject. Desirable: DP-203 Azure Data Engineer, AWS Certified Data Engineer, dbt Analytics Certification."
+            },
+            {
+                title: "Delivery Operations Manager",
+                shortDesc: "Oversee the efficiency of software delivery pipelines and operational health.",
+                salary: "£40,000 – £90,000",
+                overview: "Tech Delivery Ops Managers oversee the efficiency of software delivery pipelines. They sit at the intersection of Agile Delivery, DevOps, and Product Management, ensuring engineering teams are unblocked and releases are compliant.",
+                techSkills: ["SDLC Governance", "Agile Flow Metrics (DORA)", "Jira/Linear Mastery", "Cloud Economics (FinOps)"],
+                softSkills: ["Conflict Resolution", "Strategic Capacity Planning", "Operational Resilience"],
+                qualifications: "Mandatory: Degree in technical/business field. Required: Scrum.org PSM II, SAFe RTE, ITIL 4."
+            },
+            {
+                title: "DevOps / Platform Engineer",
+                shortDesc: "Bridge the gap between code and infrastructure using high-velocity CI/CD.",
+                salary: "£45,000 – £150,000+",
+                overview: "DevOps Engineers are the bridge between code and infrastructure. They focus on high-velocity delivery, system reliability, and Infrastructure as Code (IaC). They are increasingly focused on Cloud Sovereignty and FinOps.",
+                techSkills: ["Infrastructure as Code (Terraform)", "Kubernetes (K8s)", "CI/CD Pipeline Design", "Observability (Prometheus/Grafana)"],
+                softSkills: ["Empathy-Driven Engineering", "Incident Response", "Security Mindset (DevSecOps)"],
+                qualifications: "Mandatory: Computer Science Degree or equivalent. Required: CKA (Certified Kubernetes Admin), AWS DevOps Pro."
+            },
+            {
+                title: "Software Engineer",
+                shortDesc: "Design, build, and maintain digital products with full-stack proficiency.",
+                salary: "£30,000 – £180,000+",
+                overview: "Software Engineers design, build, and maintain digital products. Beyond writing code, modern developers are 'Systems Thinkers' who manage AI-generated code snippets, ensure high accessibility standards, and build secure APIs.",
+                techSkills: ["JavaScript/TypeScript (React)", "Python (FastAPI)", "API First Design", "SQL/NoSQL Databases"],
+                softSkills: ["Prompt Engineering (Copilot)", "Collaborative Problem Solving", "Security Literacy (OWASP)"],
+                qualifications: "Mandatory: CS Degree or top-tier Bootcamp. Required: Proficiency in Git/GitHub, AWS Certified Developer."
+            },
+            {
+                title: "Test Analyst (QA)",
+                shortDesc: "Guardians of software integrity ensuring bug-free and accessible applications.",
+                salary: "£25,000 – £75,000",
+                overview: "Test Analysts are the guardians of software integrity. Their role focuses on Quality Engineering, ensuring that applications are functional, accessible (WCAG 2.2), and compliant with data use laws. They bridge user requirements and technical delivery.",
+                techSkills: ["Functional & Regression Testing", "API Testing (Postman)", "Agile Tooling (Jira)", "Accessibility UX Testing"],
+                softSkills: ["Attention to Detail", "Stakeholder Diplomacy", "Risk-Based Analytical Thinking"],
+                qualifications: "Mandatory: ISTQB Foundation Level (CTFL). Desirable: ISTQB Agile Tester, Playwright automation basic cert."
+            },
+            {
+                title: "IT Support / Helpdesk",
+                shortDesc: "First line of defense for digital workforces and hybrid workspaces.",
+                salary: "£24,000 – £65,000",
+                overview: "IT Support professionals manage secure remote access for hybrid teams, troubleshoot cloud-based SaaS tools, and oversee AI-powered ticket triage. They ensure business continuity by bridging the gap between complex tech and the end-user.",
+                techSkills: ["Hybrid Workspace (Intune)", "Identity & Access (MFA/SSO)", "Network Troubleshooting", "AI-Tool Operations"],
+                softSkills: ["Exceptional Communication", "Triage & Prioritization", "Empathy & Patience"],
+                qualifications: "Mandatory: GCSEs Level 4+. Required: Microsoft MD-102 Endpoint Admin, CompTIA A+."
+            }
+        ];
+
+        // 1. Render all roles to the grid on page load
+        function renderRoles(roles) {
+            const grid = document.getElementById('roleGrid');
+            grid.innerHTML = ''; // Clear current
+            
+            roles.forEach((role, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>${role.title}</h3>
+                    <p>${role.shortDesc}</p>
+                    <button class="btn-outline" onclick="openModal(${index})">View Role Details</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 2. Filter logic for the Search Bar
+        function filterRoles() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = roleDatabase.filter(role => 
+                role.title.toLowerCase().includes(query) || 
+                role.shortDesc.toLowerCase().includes(query)
+            );
+            renderRoles(filtered);
+        }
+
+        // 3. Modal open/close logic
+        function openModal(index) {
+            const role = roleDatabase[index];
+            
+            document.getElementById('modalTitle').innerText = role.title;
+            document.getElementById('modalSalary').innerText = "Estimated Salary: " + role.salary;
+            document.getElementById('modalOverview').innerText = role.overview;
+            
+            // Map tech skills to tags
+            document.getElementById('modalTechSkills').innerHTML = role.techSkills.map(skill => `<span class="tag">${skill}</span>`).join('');
+            
+            // Map soft skills to tags
+            document.getElementById('modalSoftSkills').innerHTML = role.softSkills.map(skill => `<span class="tag" style="background:#fff3cd; color:#856404;">${skill}</span>`).join('');
+            
+            document.getElementById('modalQualifications').innerText = role.qualifications;
+            
+            // Show modal
+            document.getElementById('roleModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('roleModal').style.display = 'none';
+        }
+
+        // Initialize the page
+        renderRoles(roleDatabase);
+        
+        // Close modal if clicked outside the white box
+        window.onclick = function(event) {
+            const modal = document.getElementById('roleModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

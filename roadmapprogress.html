@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 - My Roadmap</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+            --success: #28A745;
+            --warning: #FF8C00;
+            --danger: #DC3545;
+            --bg-gray: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            background-color: var(--white);
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* === PROGRESS BAR === */
+        .progress-container {
+            background-color: var(--light-blue);
+            border-radius: 20px;
+            position: relative;
+            height: 25px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            background-color: var(--success);
+            height: 100%;
+            width: 0%; /* Starts at 0, updated by JS */
+            border-radius: 20px;
+            transition: width 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        /* === CARDS & SECTIONS === */
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            background: var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .card h3 { margin-top: 0; color: var(--primary-blue); }
+
+        /* === VISUAL GAP ANALYSIS (CSS Bar Charts) === */
+        .gap-row {
+            margin-bottom: 25px;
+        }
+        
+        .gap-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .gap-status { font-size: 0.85rem; padding: 2px 8px; border-radius: 12px; }
+        .status-critical { background: #ffebee; color: var(--danger); }
+        .status-gap { background: #fff3cd; color: var(--warning); }
+        .status-met { background: #e8f5e9; color: var(--success); }
+
+        .bar-bg {
+            background-color: #f0f0f0;
+            height: 20px;
+            border-radius: 10px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .bar-current {
+            background-color: var(--secondary-blue);
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: 10px 0 0 10px;
+            z-index: 2;
+        }
+
+        .bar-target {
+            background: repeating-linear-gradient(
+                45deg,
+                var(--light-blue),
+                var(--light-blue) 10px,
+                #ffffff 10px,
+                #ffffff 20px
+            );
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: 10px;
+            z-index: 1;
+            border-right: 2px dashed var(--primary-blue);
+        }
+
+        /* === ACTIONABLE CHECKLIST === */
+        .action-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--light-blue);
+            border-left: 5px solid var(--secondary-blue);
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .action-item:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .action-item.completed { background: #e8f5e9; border-left-color: var(--success); opacity: 0.8; }
+        .action-item.completed label { text-decoration: line-through; color: #666; }
+
+        .action-item input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .action-item label {
+            flex-grow: 1;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            min-width: 80px;
+        }
+        .badge.high { background-color: var(--danger); }
+        .badge.med { background-color: var(--warning); }
+        .badge.cert { background-color: var(--primary-blue); }
+
+        /* === BUTTONS === */
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-outline:hover { background-color: var(--light-blue); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Consultant Portal</h1>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='user-portal.html'">Dashboard</button>
+            <button onclick="window.location.href='browse-roles.html'">Browse Roles</button>
+            <button onclick="window.location.href='assessment-flow.html'">Self-Assessment</button>
+            <button class="active">My Roadmap</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>
+            Structural Plan: Mid-Level Business Analyst
+            <button class="btn-outline" onclick="window.print()">Export to PDF</button>
+        </h2>
+        <p>This roadmap is dynamically generated based on your latest self-assessment. Complete the action items below to close your skill gaps and reach your target role.</p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="roadmapProgress">0%</div>
+        </div>
+
+        <div class="card">
+            <h3>Visual Gap Analysis</h3>
+            <p style="margin-bottom: 25px; font-size: 0.9rem; color: #555;">Solid blue line indicates your current level. Striped line indicates the Ten10 required benchmark.</p>
+            
+            <div class="gap-row">
+                <div class="gap-label">
+                    <span>Data Visualization (Power BI)</span>
+                    <span class="gap-status status-critical">Critical Gap (Lvl 2 vs Lvl 4)</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-target" style="width: 80%;" title="Target: Level 4"></div>
+                    <div class="bar-current" style="width: 40%;" title="Current: Level 2"></div>
+                </div>
+            </div>
+
+            <div class="gap-row">
+                <div class="gap-label">
+                    <span>Requirements Engineering</span>
+                    <span class="gap-status status-gap">Gap Identified (Lvl 3 vs Lvl 4)</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-target" style="width: 80%;" title="Target: Level 4"></div>
+                    <div class="bar-current" style="width: 60%;" title="Current: Level 3"></div>
+                </div>
+            </div>
+
+            <div class="gap-row">
+                <div class="gap-label">
+                    <span>Process Modelling (BPMN)</span>
+                    <span class="gap-status status-met">Requirement Met (Lvl 3 vs Lvl 3)</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-target" style="width: 60%;" title="Target: Level 3"></div>
+                    <div class="bar-current" style="width: 60%; border-radius: 10px;" title="Current: Level 3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Action Items & Resource Links</h3>
+            
+            <ul class="action-list">
+                <li class="action-item" id="item1">
+                    <input type="checkbox" id="check1" onchange="updateProgress()">
+                    <label for="check1">Complete "Power BI Data Visualization Masterclass" on Ten10 LMS</label>
+                    <span class="badge high">High Priority</span>
+                </li>
+
+                <li class="action-item" id="item2">
+                    <input type="checkbox" id="check2" onchange="updateProgress()">
+                    <label for="check2">Obtain BCS International Diploma in Business Analysis</label>
+                    <span class="badge cert">Certification</span>
+                </li>
+
+                <li class="action-item" id="item3">
+                    <input type="checkbox" id="check3" onchange="updateProgress()">
+                    <label for="check3">Shadow Senior BA on User Story Discovery Workshops (2 Weeks)</label>
+                    <span class="badge med">Medium Priority</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Progress Tracker Logic
+        function updateProgress() {
+            // Get all checkboxes and calculate how many are checked
+            const checkboxes = document.querySelectorAll('.action-item input[type="checkbox"]');
+            const totalTasks = checkboxes.length;
+            let completedTasks = 0;
+
+            checkboxes.forEach((cb, index) => {
+                const parentItem = document.getElementById(`item${index + 1}`);
+                if (cb.checked) {
+                    completedTasks++;
+                    parentItem.classList.add('completed');
+                } else {
+                    parentItem.classList.remove('completed');
+                }
+            });
+
+            // Calculate percentage
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+            
+            // Update the UI Progress Bar
+            const progressBar = document.getElementById('roadmapProgress');
+            progressBar.style.width = percentage + '%';
+            
+            // Show text inside the bar only if it's wide enough
+            if (percentage > 5) {
+                progressBar.innerText = percentage + '%';
+            } else {
+                progressBar.innerText = '';
+            }
+
+            // Optional: Celebration alert if 100%
+            if (percentage === 100) {
+                setTimeout(() => {
+                    alert("Congratulations! You have completed your structural roadmap. You are ready for your promotion review!");
+                }, 400); // slight delay to let the animation finish
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 Admin - Roadmap Builder & Resources</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+            --success: #28A745;
+            --warning: #FF8C00;
+            --danger: #DC3545;
+            --bg-gray: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: #1a2a3a; /* Darker header for Admin distinction */
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 10px;}
+        header h1 span { background: var(--danger); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--secondary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* === PANELS === */
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .panel h2 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* === FILTER BAR === */
+        .filter-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background-color: var(--light-blue);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar select {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--primary-blue);
+            font-size: 1rem;
+            min-width: 250px;
+        }
+
+        /* === TABLES === */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        tr:hover { background-color: #f8fbff; }
+
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        /* Status Badges */
+        .gap-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .gap-critical { background-color: #ffebee; color: var(--danger); }
+        .gap-minor { background-color: #fff3cd; color: var(--warning); }
+
+        /* === ACTION BUILDER SECTION === */
+        .builder-section {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            background-color: #f8fbff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .builder-group {
+            flex: 1;
+        }
+
+        .builder-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-blue);
+        }
+
+        .builder-group select, .builder-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        /* === BUTTONS === */
+        .btn-primary {
+            background-color: var(--secondary-blue);
+            color: var(--white);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background-color: var(--primary-blue); transform: translateY(-2px); }
+
+        /* Notification Toast */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--success);
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 15px;
+            position: fixed;
+            z-index: 1000;
+            right: 30px;
+            bottom: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Admin Portal <span>ADMINISTRATOR</span></h1>
+        <div class="nav-buttons">
+            <button onclick="alert('Navigating to Dashboard...')">Dashboard</button>
+            <button onclick="window.location.href='admin-manage-roles.html'">Role Benchmarks</button>
+            <button class="active">Roadmap Builder & Resources</button>
+            <button onclick="window.location.href='user-portal.html'" style="border-color: var(--danger); color: #ffcccc;">Exit Admin</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="panel">
+            <h2>Identify Collective Team Gaps</h2>
+            <p>Filter by cohort to view consultants who fall below the required matrix benchmarks. Select users to assign remedial training to their personal roadmaps.</p>
+            
+            <div class="filter-bar">
+                <label style="font-weight: bold;">Filter Cohort By Role:</label>
+                <select id="roleFilter" onchange="filterGaps()">
+                    <option value="All">All Roles (Company-Wide)</option>
+                    <option value="Business Analyst" selected>Business Analysts</option>
+                    <option value="DevOps Engineer">DevOps Engineers</option>
+                    <option value="Test Analyst">Test Analysts</option>
+                </select>
+                <span id="gapCount" style="color: var(--primary-blue); font-weight: bold; margin-left: auto;">Showing 3 Gap(s)</span>
+            </div>
+
+            <table id="gapTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"><input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes(this)"></th>
+                        <th>Consultant Name</th>
+                        <th>Role</th>
+                        <th>Skill Deficit</th>
+                        <th>Current Lvl</th>
+                        <th>Target Lvl</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody id="gapTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>Allocate Resources to Selected Roadmaps</h2>
+            
+            <div class="builder-section">
+                <div class="builder-group">
+                    <label>Resource Type</label>
+                    <select id="resourceType" onchange="populateResources()">
+                        <option value="course">E-Learning / LMS Course</option>
+                        <option value="cert">Official Certification</option>
+                        <option value="mentor">Mentoring / Shadowing</option>
+                    </select>
+                </div>
+                
+                <div class="builder-group">
+                    <label>Select Specific Resource / Action</label>
+                    <select id="resourceAction">
+                        </select>
+                </div>
+
+                <div class="builder-group" style="flex: 0.5;">
+                    <label>Priority</label>
+                    <select id="resourcePriority">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary" onclick="pushToRoadmaps()">Push to Roadmaps</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast">Resource successfully pushed to consultant roadmaps!</div>
+
+    <script>
+        // --- 1. MOCK DATABASE OF GAPS ---
+        const gapsDB = [
+            { id: 101, name: "Imole Demo", role: "Business Analyst", skill: "Data Visualization (Power BI)", current: 2, target: 4 },
+            { id: 102, name: "Sarah Jenkins", role: "Business Analyst", skill: "Requirements Engineering", current: 3, target: 4 },
+            { id: 103, name: "David Chen", role: "Business Analyst", skill: "Data Visualization (Power BI)", current: 3, target: 4 },
+            { id: 104, name: "Alice Smith", role: "Test Analyst", skill: "API Testing (Postman)", current: 1, target: 3 },
+            { id: 105, name: "Marcus Johnson", role: "DevOps Engineer", skill: "Cloud Economics (FinOps)", current: 2, target: 4 },
+            { id: 106, name: "Priya Patel", role: "DevOps Engineer", skill: "Infrastructure as Code", current: 3, target: 4 }
+        ];
+
+        // --- 2. MOCK DATABASE OF RESOURCES ---
+        const resourcesDB = {
+            course: [
+                "Power BI Data Visualization Masterclass",
+                "Advanced Python for QA Automation",
+                "FinOps & Cloud Cost Optimization Basics",
+                "Agile Flow Metrics Workshop"
+            ],
+            cert: [
+                "BCS International Diploma in Business Analysis",
+                "ISTQB Certified Tester Foundation Level",
+                "AWS Certified DevOps Engineer – Professional",
+                "Certified Kubernetes Administrator (CKA)"
+            ],
+            mentor: [
+                "Shadow Senior BA on User Story Workshops (2 Weeks)",
+                "Pair Programming with Lead DevOps Engineer",
+                "1-on-1 Mentoring Session with Operations Manager"
+            ]
+        };
+
+        // --- 3. UI POPULATION LOGIC ---
+        
+        // Filter and Render the Gap Table
+        function filterGaps() {
+            const selectedRole = document.getElementById('roleFilter').value;
+            const tbody = document.getElementById('gapTableBody');
+            tbody.innerHTML = '';
+            
+            let filteredGaps = gapsDB;
+            if (selectedRole !== 'All') {
+                filteredGaps = gapsDB.filter(gap => gap.role === selectedRole);
+            }
+
+            // Update Counter
+            document.getElementById('gapCount').innerText = `Showing ${filteredGaps.length} Gap(s)`;
+
+            // Uncheck the "Select All" box on refresh
+            document.getElementById('selectAll').checked = false;
+
+            filteredGaps.forEach(gap => {
+                const diff = gap.target - gap.current;
+                const severityClass = diff >= 2 ? 'gap-critical' : 'gap-minor';
+                const severityText = diff >= 2 ? 'Critical' : 'Minor';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="checkbox" class="user-checkbox" value="${gap.id}"></td>
+                    <td style="font-weight: bold;">${gap.name}</td>
+                    <td>${gap.role}</td>
+                    <td>${gap.skill}</td>
+                    <td>Lvl ${gap.current}</td>
+                    <td>Lvl ${gap.target}</td>
+                    <td><span class="gap-badge ${severityClass}">${severityText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Populate the Resource Dropdown based on Type selected
+        function populateResources() {
+            const type = document.getElementById('resourceType').value;
+            const actionDropdown = document.getElementById('resourceAction');
+            actionDropdown.innerHTML = '';
+
+            resourcesDB[type].forEach(resource => {
+                const option = document.createElement('option');
+                option.value = resource;
+                option.innerText = resource;
+                actionDropdown.appendChild(option);
+            });
+        }
+
+        // --- 4. INTERACTION LOGIC ---
+
+        // Select All Checkboxes
+        function toggleAllCheckboxes(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = masterCheckbox.checked;
+            });
+        }
+
+        // Push Resource to Roadmaps (Simulate Database write)
+        function pushToRoadmaps() {
+            const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert("Please select at least one consultant from the table above.");
+                return;
+            }
+
+            const resourceName = document.getElementById('resourceAction').value;
+            const priority = document.getElementById('resourcePriority').value;
+            
+            // Show Success Toast
+            const toast = document.getElementById("toast");
+            toast.innerText = `Successfully assigned "${resourceName}" (${priority} Priority) to ${checkboxes.length} consultant(s)!`;
+            toast.className = "show";
+            
+            // Uncheck boxes after assigning
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+                document.getElementById('selectAll').checked = false;
+                toggleAllCheckboxes(document.getElementById('selectAll'));
+            }, 3000);
+        }
+
+        // --- INITIALIZATION ---
+        filterGaps(); // Load initial table (Business Analysts default)
+        populateResources(); // Load initial resources
+
+    </script>
+</body>
+</html>
