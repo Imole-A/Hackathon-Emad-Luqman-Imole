@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 - Self Assessment</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+            --success: #28A745;
+            --bg-gray: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            background-color: var(--white);
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* === COMPETENCY SCALE KEY === */
+        .scale-key {
+            background-color: var(--light-blue);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-blue);
+        }
+        
+        .scale-key h4 { margin-top: 0; color: var(--primary-blue); }
+        .scale-key ul { margin: 0; padding-left: 20px; font-size: 0.9rem; }
+
+        /* === ASSESSMENT QUESTIONS === */
+        .skill-group {
+            margin-bottom: 40px;
+        }
+
+        .skill-group h3 {
+            color: var(--secondary-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .assessment-item {
+            padding: 20px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .assessment-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .skill-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .skill-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* === INTERACTIVE 1-5 RATING BUTTONS === */
+        .rating-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rating-group input[type="radio"] {
+            display: none; /* Hide standard radio buttons */
+        }
+
+        .rating-label {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            background-color: #fafafa;
+        }
+
+        .rating-label:hover {
+            border-color: var(--secondary-blue);
+            background-color: var(--light-blue);
+        }
+
+        /* When radio is checked, style the label */
+        .rating-group input[type="radio"]:checked + .rating-label {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 8px rgba(0, 86, 179, 0.2);
+        }
+
+        /* === BOTTOM ACTIONS === */
+        .action-bar {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--light-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-blue);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { 
+            background-color: var(--primary-blue); 
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-outline:hover { background-color: var(--light-blue); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Consultant Portal</h1>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='user-portal.html'">Dashboard</button>
+            <button onclick="window.location.href='browse-roles.html'">Browse Roles</button>
+            <button class="active">Self-Assessment</button>
+            <button onclick="window.location.href='user-portal.html'">My Roadmap</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Assess Your Proficiency: Business Analyst</h2>
+        <p>Honest self-assessment is the first step to building your roadmap. Evaluate your current capabilities against the Ten10 framework below.</p>
+
+        <div class="scale-key">
+            <h4>Competency Level Key</h4>
+            <ul>
+                <li><strong>1 - Novice:</strong> Fundamental awareness, requires close supervision.</li>
+                <li><strong>2 - Practitioner:</strong> Can perform routine tasks independently.</li>
+                <li><strong>3 - Competent:</strong> Handles complex issues, works fully independently.</li>
+                <li><strong>4 - Advanced:</strong> Deep expertise, guides others, optimizes processes.</li>
+                <li><strong>5 - Expert:</strong> Sets organizational standards and strategic direction.</li>
+            </ul>
+        </div>
+
+        <form id="assessmentForm" onsubmit="event.preventDefault(); submitAssessment();">
+            
+            <div class="skill-group">
+                <h3>Core Technical Skills</h3>
+                
+                <div class="assessment-item">
+                    <div class="skill-header">
+                        <span class="skill-title">Requirements Engineering</span>
+                    </div>
+                    <div class="skill-desc">Expertise in capturing User Stories, Acceptance Criteria, and Non-Functional Requirements.</div>
+                    <div class="rating-group">
+                        <input type="radio" name="reqEng" id="reqEng1" value="1"><label class="rating-label" for="reqEng1">1</label>
+                        <input type="radio" name="reqEng" id="reqEng2" value="2"><label class="rating-label" for="reqEng2">2</label>
+                        <input type="radio" name="reqEng" id="reqEng3" value="3"><label class="rating-label" for="reqEng3">3</label>
+                        <input type="radio" name="reqEng" id="reqEng4" value="4"><label class="rating-label" for="reqEng4">4</label>
+                        <input type="radio" name="reqEng" id="reqEng5" value="5"><label class="rating-label" for="reqEng5">5</label>
+                    </div>
+                </div>
+
+                <div class="assessment-item">
+                    <div class="skill-header">
+                        <span class="skill-title">Data Visualization</span>
+                    </div>
+                    <div class="skill-desc">Proficiency in Power BI or Tableau to present data-driven insights to stakeholders.</div>
+                    <div class="rating-group">
+                        <input type="radio" name="dataViz" id="dataViz1" value="1"><label class="rating-label" for="dataViz1">1</label>
+                        <input type="radio" name="dataViz" id="dataViz2" value="2"><label class="rating-label" for="dataViz2">2</label>
+                        <input type="radio" name="dataViz" id="dataViz3" value="3"><label class="rating-label" for="dataViz3">3</label>
+                        <input type="radio" name="dataViz" id="dataViz4" value="4"><label class="rating-label" for="dataViz4">4</label>
+                        <input type="radio" name="dataViz" id="dataViz5" value="5"><label class="rating-label" for="dataViz5">5</label>
+                    </div>
+                </div>
+
+                <div class="assessment-item">
+                    <div class="skill-header">
+                        <span class="skill-title">Process Modelling</span>
+                    </div>
+                    <div class="skill-desc">Advanced use of BPMN 2.0 or UML for "As-Is" and "To-Be" mapping.</div>
+                    <div class="rating-group">
+                        <input type="radio" name="procMod" id="procMod1" value="1"><label class="rating-label" for="procMod1">1</label>
+                        <input type="radio" name="procMod" id="procMod2" value="2"><label class="rating-label" for="procMod2">2</label>
+                        <input type="radio" name="procMod" id="procMod3" value="3"><label class="rating-label" for="procMod3">3</label>
+                        <input type="radio" name="procMod" id="procMod4" value="4"><label class="rating-label" for="procMod4">4</label>
+                        <input type="radio" name="procMod" id="procMod5" value="5"><label class="rating-label" for="procMod5">5</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>Soft Skills</h3>
+                
+                <div class="assessment-item">
+                    <div class="skill-header">
+                        <span class="skill-title">Stakeholder Management</span>
+                    </div>
+                    <div class="skill-desc">Navigating complex corporate hierarchies to achieve consensus.</div>
+                    <div class="rating-group">
+                        <input type="radio" name="stakeMgmt" id="stakeMgmt1" value="1"><label class="rating-label" for="stakeMgmt1">1</label>
+                        <input type="radio" name="stakeMgmt" id="stakeMgmt2" value="2"><label class="rating-label" for="stakeMgmt2">2</label>
+                        <input type="radio" name="stakeMgmt" id="stakeMgmt3" value="3"><label class="rating-label" for="stakeMgmt3">3</label>
+                        <input type="radio" name="stakeMgmt" id="stakeMgmt4" value="4"><label class="rating-label" for="stakeMgmt4">4</label>
+                        <input type="radio" name="stakeMgmt" id="stakeMgmt5" value="5"><label class="rating-label" for="stakeMgmt5">5</label>
+                    </div>
+                </div>
+
+                <div class="assessment-item">
+                    <div class="skill-header">
+                        <span class="skill-title">Facilitation & Discovery</span>
+                    </div>
+                    <div class="skill-desc">Running high-energy discovery workshops (hybrid/remote environments).</div>
+                    <div class="rating-group">
+                        <input type="radio" name="facil" id="facil1" value="1"><label class="rating-label" for="facil1">1</label>
+                        <input type="radio" name="facil" id="facil2" value="2"><label class="rating-label" for="facil2">2</label>
+                        <input type="radio" name="facil" id="facil3" value="3"><label class="rating-label" for="facil3">3</label>
+                        <input type="radio" name="facil" id="facil4" value="4"><label class="rating-label" for="facil4">4</label>
+                        <input type="radio" name="facil" id="facil5" value="5"><label class="rating-label" for="facil5">5</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button type="button" class="btn-outline" onclick="window.location.href='user-portal.html'">Cancel Assessment</button>
+                <button type="submit" class="btn-primary">Save & Generate Roadmap</button>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        function submitAssessment() {
+            // Check if all questions have been answered
+            const questions = ['reqEng', 'dataViz', 'procMod', 'stakeMgmt', 'facil'];
+            let allAnswered = true;
+
+            for (let q of questions) {
+                const checked = document.querySelector(`input[name="${q}"]:checked`);
+                if (!checked) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            if (!allAnswered) {
+                alert("Please provide a rating for all skills before submitting.");
+                return;
+            }
+
+            // Simulate sending data to the database
+            const btn = document.querySelector('button[type="submit"]');
+            btn.innerText = "Analyzing Gaps...";
+            btn.style.backgroundColor = "var(--success)";
+            
+            // Wait 1.5 seconds to simulate processing, then redirect to the portal (which holds the roadmap)
+            setTimeout(() => {
+                alert("Success! Your self-assessment has been saved. Your structural roadmap has been updated.");
+                // Redirecting back to the user portal roadmap view
+                window.location.href = "user-portal.html"; 
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

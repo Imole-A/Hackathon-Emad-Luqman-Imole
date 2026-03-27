@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 Admin - Insights & Analytics</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+            --success: #28A745;
+            --warning: #FF8C00;
+            --danger: #DC3545;
+            --bg-gray: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: #1a2a3a; 
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 10px;}
+        header h1 span { background: var(--danger); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--secondary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* === KPI CARDS === */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--secondary-blue);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .kpi-card h3 { margin: 0; color: #666; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-card .number { font-size: 2.5rem; font-weight: bold; color: var(--primary-blue); margin: 10px 0; }
+        .kpi-card .trend { font-size: 0.85rem; font-weight: bold; }
+        .trend.up { color: var(--success); }
+        .trend.down { color: var(--danger); }
+
+        /* === PANELS === */
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .panel h2 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* === BAR CHART (CSS) === */
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-label { width: 250px; font-weight: bold; font-size: 0.95rem;}
+        
+        .chart-bar-container {
+            flex-grow: 1;
+            background: #f0f0f0;
+            height: 25px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border-radius: 4px 0 0 4px;
+        }
+
+        /* === HEATMAP MATRIX === */
+        .heatmap-container {
+            overflow-x: auto;
+        }
+
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .heatmap-table th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 15px;
+            border: 1px solid var(--white);
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+
+        .heatmap-table td {
+            padding: 15px;
+            border: 2px solid var(--white);
+            font-weight: bold;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .heatmap-table td:hover {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .heatmap-row-header {
+            text-align: left !important;
+            background-color: #f8fbff !important;
+            color: var(--text-dark) !important;
+            font-weight: bold;
+        }
+
+        /* Heatmap Colors */
+        .hm-excellent { background-color: #c8e6c9; color: #2e7d32 !important; } /* High Met */
+        .hm-good { background-color: #e8f5e9; color: #2e7d32 !important; }      /* Met */
+        .hm-warning { background-color: #fff3cd; color: #856404 !important; }   /* Minor Gap */
+        .hm-critical { background-color: #ffcdd2; color: #c62828 !important; }  /* Major Gap */
+        .hm-na { background-color: #f0f0f0; color: #aaa !important; cursor: default; pointer-events: none;} /* N/A */
+
+        /* === DRILL-DOWN MODAL === */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+            background: none;
+            border: none;
+        }
+        
+        .close-btn:hover { color: var(--danger); }
+
+        .modal-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .modal-list li {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-sm {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .btn-sm:hover { background-color: var(--primary-blue); color: var(--white); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Admin Portal <span>ADMINISTRATOR</span></h1>
+        <div class="nav-buttons">
+            <button onclick="alert('Navigating to Dashboard...')">Dashboard</button>
+            <button onclick="window.location.href='admin-manage-roles.html'">Role Benchmarks</button>
+            <button onclick="window.location.href='admin-roadmap-builder.html'">Roadmap Builder</button>
+            <button class="active">Insights & Analytics</button>
+            <button onclick="window.location.href='user-portal.html'" style="border-color: var(--danger); color: #ffcccc;">Exit Admin</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: var(--primary-blue);">
+                <h3>Total Consultants Assessed</h3>
+                <div class="number">142</div>
+                <div class="trend up">↑ 12 this month</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--success);">
+                <h3>Overall Team Readiness</h3>
+                <div class="number">78%</div>
+                <div class="trend up">↑ 4% vs last quarter</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--danger);">
+                <h3>Critical Skill Gaps</h3>
+                <div class="number">24</div>
+                <div class="trend down">↓ 5 gaps closed</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--warning);">
+                <h3>Active Roadmaps</h3>
+                <div class="number">89</div>
+                <div class="trend up">↑ 15 new roadmaps</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Top Missing Skills (Company-Wide) <button class="btn-sm" onclick="window.print()">Export Report</button></h2>
+            <p style="margin-bottom: 20px; font-size: 0.95rem; color: #555;">These are the specific skills where the highest percentage of consultants fall below their required matrix benchmark.</p>
+            
+            <div class="chart-row">
+                <div class="chart-label">Data Visualization (Power BI)</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar" style="width: 65%; background-color: var(--danger);">65% Gap Rate</div>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-label">Cloud Economics (FinOps)</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar" style="width: 52%; background-color: var(--warning);">52% Gap Rate</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-label">API Testing (Postman)</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar" style="width: 40%; background-color: var(--warning);">40% Gap Rate</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-label">Requirements Engineering</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar" style="width: 18%; background-color: var(--secondary-blue);">18% Gap Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Collective Skill Gap Heatmap</h2>
+            <p style="margin-bottom: 20px; font-size: 0.95rem; color: #555;">Cross-reference core roles against required technical skills. <strong>Click on any Red or Yellow cell</strong> to view the specific consultants causing the gap.</p>
+            
+            <div class="heatmap-container">
+                <table class="heatmap-table">
+                    <thead>
+                        <tr>
+                            <th>Skills \ Roles</th>
+                            <th>Business Analyst</th>
+                            <th>Data Engineer</th>
+                            <th>DevOps Engineer</th>
+                            <th>Test Analyst</th>
+                            <th>Software Engineer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="heatmap-row-header">Data Visualization</td>
+                            <td class="hm-critical" onclick="openDrillDown('Business Analyst', 'Data Visualization')">-1.2 Avg Gap</td>
+                            <td class="hm-good" onclick="openDrillDown('Data Engineer', 'Data Visualization')">Met</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-good" onclick="openDrillDown('Software Engineer', 'Data Visualization')">Met</td>
+                        </tr>
+                        <tr>
+                            <td class="heatmap-row-header">Advanced SQL</td>
+                            <td class="hm-warning" onclick="openDrillDown('Business Analyst', 'Advanced SQL')">-0.5 Avg Gap</td>
+                            <td class="hm-excellent" onclick="openDrillDown('Data Engineer', 'Advanced SQL')">+0.8 Exceeds</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-good" onclick="openDrillDown('Test Analyst', 'Advanced SQL')">Met</td>
+                            <td class="hm-excellent" onclick="openDrillDown('Software Engineer', 'Advanced SQL')">+0.5 Exceeds</td>
+                        </tr>
+                        <tr>
+                            <td class="heatmap-row-header">API Testing</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-good" onclick="openDrillDown('Data Engineer', 'API Testing')">Met</td>
+                            <td class="hm-good" onclick="openDrillDown('DevOps Engineer', 'API Testing')">Met</td>
+                            <td class="hm-critical" onclick="openDrillDown('Test Analyst', 'API Testing')">-1.5 Avg Gap</td>
+                            <td class="hm-warning" onclick="openDrillDown('Software Engineer', 'API Testing')">-0.4 Avg Gap</td>
+                        </tr>
+                        <tr>
+                            <td class="heatmap-row-header">Cloud Economics</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-warning" onclick="openDrillDown('Data Engineer', 'Cloud Economics')">-0.6 Avg Gap</td>
+                            <td class="hm-critical" onclick="openDrillDown('DevOps Engineer', 'Cloud Economics')">-1.1 Avg Gap</td>
+                            <td class="hm-na">N/A</td>
+                            <td class="hm-good" onclick="openDrillDown('Software Engineer', 'Cloud Economics')">Met</td>
+                        </tr>
+                        <tr>
+                            <td class="heatmap-row-header">Agile Methodologies</td>
+                            <td class="hm-excellent" onclick="openDrillDown('Business Analyst', 'Agile')">+0.5 Exceeds</td>
+                            <td class="hm-good" onclick="openDrillDown('Data Engineer', 'Agile')">Met</td>
+                            <td class="hm-good" onclick="openDrillDown('DevOps Engineer', 'Agile')">Met</td>
+                            <td class="hm-good" onclick="openDrillDown('Test Analyst', 'Agile')">Met</td>
+                            <td class="hm-good" onclick="openDrillDown('Software Engineer', 'Agile')">Met</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="drillDownModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeDrillDown()">&times;</button>
+            <h2 id="modalTitle" style="color: var(--danger); border-bottom: none; margin-bottom: 5px;">Critical Gap Alert</h2>
+            <p><strong>Role:</strong> <span id="modalRole"></span> | <strong>Skill:</strong> <span id="modalSkill"></span></p>
+            <p style="font-size: 0.9rem; color: #666;">The following consultants are currently below the required matrix benchmark for this skill:</p>
+            
+            <ul class="modal-list" id="modalUserList">
+                </ul>
+            
+            <button class="btn-sm" style="width: 100%; margin-top: 20px; padding: 10px; background: var(--secondary-blue); color: white;" onclick="window.location.href='admin-roadmap-builder.html'">Assign Training to Cohort in Roadmap Builder</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulated Database of users causing gaps
+        const gapData = {
+            "Business Analyst-Data Visualization": [
+                { name: "Imole Demo", current: 2, target: 4 },
+                { name: "David Chen", current: 2, target: 4 },
+                { name: "Sarah Jenkins", current: 3, target: 4 }
+            ],
+            "Test Analyst-API Testing": [
+                { name: "Alice Smith", current: 1, target: 3 },
+                { name: "Bob Jones", current: 2, target: 3 }
+            ],
+            "DevOps Engineer-Cloud Economics": [
+                { name: "Marcus Johnson", current: 2, target: 4 },
+                { name: "Priya Patel", current: 3, target: 4 },
+                { name: "Tom Hardy", current: 2, target: 4 }
+            ]
+        };
+
+        // Open Drill Down Modal
+        function openDrillDown(role, skill) {
+            // Check if it's a gap (we only simulate data for the red/yellow ones in this demo)
+            const key = `${role}-${skill}`;
+            const users = gapData[key];
+
+            if (!users) {
+                alert(`The ${role} cohort is currently meeting or exceeding the benchmark for ${skill}. No intervention required.`);
+                return;
+            }
+
+            // Populate Modal
+            document.getElementById('modalRole').innerText = role;
+            document.getElementById('modalSkill').innerText = skill;
+            
+            const list = document.getElementById('modalUserList');
+            list.innerHTML = '';
+            
+            users.forEach(u => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span><strong>${u.name}</strong></span>
+                    <span><span style="color:var(--danger); font-weight:bold;">Lvl ${u.current}</span> / Target Lvl ${u.target}</span>
+                `;
+                list.appendChild(li);
+            });
+
+            // Show Modal
+            document.getElementById('drillDownModal').style.display = 'flex';
+        }
+
+        // Close Modal
+        function closeDrillDown() {
+            document.getElementById('drillDownModal').style.display = 'none';
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('drillDownModal');
+            if (event.target == modal) {
+                closeDrillDown();
+            }
+        }
+    </script>
+</body>
+</html>

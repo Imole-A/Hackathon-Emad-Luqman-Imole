@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ten10 Admin - Resource Management</title>
+    <style>
+        /* === COLOR THEME & GLOBAL STYLES === */
+        :root {
+            --primary-blue: #0056b3; 
+            --secondary-blue: #007BFF;
+            --light-blue: #E6F2FF;   
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --border-color: #CCE0FF;
+            --success: #28A745;
+            --warning: #FF8C00;
+            --danger: #DC3545;
+            --purple: #6f42c1;
+            --bg-gray: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray); 
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAVIGATION === */
+        header {
+            background-color: #1a2a3a; 
+            color: var(--white);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 10px;}
+        header h1 span { background: var(--danger); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
+
+        .nav-buttons button {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons button:hover, .nav-buttons button.active {
+            background: var(--white);
+            color: var(--secondary-blue);
+        }
+
+        /* === PAGE CONTAINER === */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 2.5fr; /* Split layout: Add form on left, Table on right */
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        /* === PANELS === */
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.1);
+            height: fit-content;
+        }
+
+        .panel h2 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* === ADD RESOURCE FORM === */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-blue);
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-add {
+            width: 100%;
+            background-color: var(--secondary-blue);
+            color: var(--white);
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .btn-add:hover { background-color: var(--primary-blue); transform: translateY(-2px); }
+
+        /* === RESOURCE TABLE & FILTERS === */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-bar input, .filter-bar select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        tr:hover { background-color: #f8fbff; }
+
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+        }
+        .bg-course { background-color: var(--secondary-blue); }
+        .bg-cert { background-color: var(--purple); }
+        .bg-mentor { background-color: var(--success); }
+
+        .btn-delete {
+            background: none;
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .btn-delete:hover { text-decoration: underline; }
+
+        /* Notification Toast */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--success);
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 15px;
+            position: fixed;
+            z-index: 1000;
+            right: 30px;
+            bottom: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ten10 Admin Portal <span>ADMINISTRATOR</span></h1>
+        <div class="nav-buttons">
+            <button onclick="alert('Navigating to Dashboard...')">Dashboard</button>
+            <button onclick="window.location.href='admin-manage-roles.html'">Role Benchmarks</button>
+            <button onclick="window.location.href='admin-roadmap-builder.html'">Roadmap Builder</button>
+            <button class="active">Resource Catalog</button>
+            <button onclick="window.location.href='user-portal.html'" style="border-color: var(--danger); color: #ffcccc;">Exit Admin</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="panel">
+            <h2>Add to Catalog</h2>
+            <form onsubmit="event.preventDefault(); addResource();">
+                
+                <div class="form-group">
+                    <label>Resource Title</label>
+                    <input type="text" id="resTitle" class="form-control" placeholder="e.g., Advanced Python Course" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Resource Type</label>
+                    <select id="resType" class="form-control" required>
+                        <option value="Course">E-Learning / Course</option>
+                        <option value="Certification">Official Certification</option>
+                        <option value="Mentorship">Mentorship / Shadowing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Skill (Maps to Matrix)</label>
+                    <select id="resSkill" class="form-control" required>
+                        <option value="Python Programming">Python Programming</option>
+                        <option value="Data Visualization">Data Visualization</option>
+                        <option value="Requirements Engineering">Requirements Engineering</option>
+                        <option value="API Testing">API Testing</option>
+                        <option value="Cloud Economics (FinOps)">Cloud Economics (FinOps)</option>
+                        <option value="Agile Methodologies">Agile Methodologies</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimated Cost / Budget</label>
+                    <input type="text" id="resCost" class="form-control" placeholder="e.g., £0 (Internal) or £150" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Link / URL (Optional)</label>
+                    <input type="text" id="resUrl" class="form-control" placeholder="https://...">
+                </div>
+
+                <button type="submit" class="btn-add">+ Save Resource</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h2>Ten10 Resource Master Library</h2>
+            
+            <div class="filter-bar">
+                <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Search catalog...">
+                <select id="filterType" onchange="renderTable()">
+                    <option value="All">All Types</option>
+                    <option value="Course">Courses Only</option>
+                    <option value="Certification">Certifications Only</option>
+                    <option value="Mentorship">Mentorships Only</option>
+                </select>
+            </div>
+
+            <table id="resourceTable">
+                <thead>
+                    <tr>
+                        <th>Resource Title</th>
+                        <th>Type</th>
+                        <th>Maps To Skill</th>
+                        <th>Cost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="resourceTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div id="toast">Resource successfully added to the catalog!</div>
+
+    <script>
+        // Mock Database for the Resource Library
+        let catalogDB = [
+            { id: 1, title: "Power BI Data Visualization Masterclass", type: "Course", skill: "Data Visualization", cost: "£0 (Internal)" },
+            { id: 2, title: "BCS International Diploma in Business Analysis", type: "Certification", skill: "Requirements Engineering", cost: "£1,250" },
+            { id: 3, title: "Postman API Automation Bootcamp", type: "Course", skill: "API Testing", cost: "£45" },
+            { id: 4, title: "Pair Programming with Lead DevOps", type: "Mentorship", skill: "Cloud Economics (FinOps)", cost: "Time Allocation" },
+            { id: 5, title: "ISTQB Certified Agile Tester", type: "Certification", skill: "Agile Methodologies", cost: "£195" }
+        ];
+
+        // 1. Render Table based on Data & Filters
+        function renderTable() {
+            const tbody = document.getElementById('resourceTableBody');
+            const searchQ = document.getElementById('searchInput').value.toLowerCase();
+            const filterT = document.getElementById('filterType').value;
+
+            tbody.innerHTML = '';
+
+            catalogDB.forEach(res => {
+                // Apply Filters
+                if (filterT !== "All" && res.type !== filterT) return;
+                if (searchQ && !res.title.toLowerCase().includes(searchQ) && !res.skill.toLowerCase().includes(searchQ)) return;
+
+                // Determine Badge Color
+                let badgeClass = 'bg-course';
+                if (res.type === 'Certification') badgeClass = 'bg-cert';
+                if (res.type === 'Mentorship') badgeClass = 'bg-mentor';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:bold; color:var(--primary-blue);">${res.title}</td>
+                    <td><span class="badge ${badgeClass}">${res.type}</span></td>
+                    <td>${res.skill}</td>
+                    <td>${res.cost}</td>
+                    <td><button class="btn-delete" onclick="deleteResource(${res.id})">Remove</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 2. Add New Resource
+        function addResource() {
+            const newRes = {
+                id: Date.now(),
+                title: document.getElementById('resTitle').value,
+                type: document.getElementById('resType').value,
+                skill: document.getElementById('resSkill').value,
+                cost: document.getElementById('resCost').value
+            };
+
+            catalogDB.push(newRes);
+            renderTable();
+
+            // Clear Form
+            document.getElementById('resTitle').value = '';
+            document.getElementById('resCost').value = '';
+            document.getElementById('resUrl').value = '';
+
+            // Show Toast
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // 3. Delete Resource
+        function deleteResource(id) {
+            if (confirm("Are you sure you want to remove this resource from the master catalog? It will no longer be available to assign to roadmaps.")) {
+                catalogDB = catalogDB.filter(res => res.id !== id);
+                renderTable();
+            }
+        }
+
+        // Initial Render
+        renderTable();
+
+    </script>
+</body>
+</html>
